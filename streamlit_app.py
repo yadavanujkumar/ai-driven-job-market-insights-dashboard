@@ -469,7 +469,7 @@ def show_about():
     
     ---
     
-    **Version**: 2.0 (Streamlit Edition)
+    **Version**: 2.1 (Streamlit Edition)
     
     **Repository**: [GitHub](https://github.com/yadavanujkumar/ai-driven-job-market-insights-dashboard)
     """)
