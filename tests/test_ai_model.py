@@ -11,7 +11,14 @@ class TestAIModel(unittest.TestCase):
             {'category': 'Marketing', 'salary': 80000}
         ]
         trends = model.analyze_trends(job_data)
-        self.assertEqual(trends, {'Engineering': 110000, 'Marketing': 80000})
+        
+        # Verify structure and key statistics
+        self.assertIn('Engineering', trends)
+        self.assertIn('Marketing', trends)
+        self.assertEqual(trends['Engineering']['average_salary'], 110000)
+        self.assertEqual(trends['Engineering']['job_count'], 2)
+        self.assertEqual(trends['Marketing']['average_salary'], 80000)
+        self.assertEqual(trends['Marketing']['job_count'], 1)
 
     def test_predict(self):
         model = AIModel()
