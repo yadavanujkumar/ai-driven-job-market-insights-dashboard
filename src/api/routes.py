@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, jsonify, request, render_template
 from src.services.job_service import JobService
 from src.utils.validation import ValidationError
 from src.utils.logger import setup_logger
@@ -6,6 +6,7 @@ from src.utils.logger import setup_logger
 logger = setup_logger(__name__)
 
 job_routes = Blueprint('job_routes', __name__)
+dashboard_routes = Blueprint('dashboard_routes', __name__)
 
 # Initialize the service
 job_service = JobService()
@@ -146,3 +147,18 @@ def health_check():
         'message': 'Service is healthy',
         'service': 'AI-Driven Job Market Insights Dashboard'
     }), 200
+
+# Dashboard routes
+@dashboard_routes.route('/')
+def index():
+    """
+    Landing page for the dashboard.
+    """
+    return render_template('index.html')
+
+@dashboard_routes.route('/dashboard')
+def dashboard():
+    """
+    Main dashboard view.
+    """
+    return render_template('dashboard.html')

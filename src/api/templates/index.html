@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI-Driven Job Market Insights Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            padding: 60px 20px;
+            color: white;
+        }
+
+        h1 {
+            font-size: 3em;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .subtitle {
+            font-size: 1.3em;
+            opacity: 0.95;
+            margin-bottom: 40px;
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            margin: 40px 0;
+        }
+
+        .feature-card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .feature-icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+        }
+
+        .feature-card h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 1.5em;
+        }
+
+        .feature-card p {
+            color: #666;
+            line-height: 1.6;
+        }
+
+        .cta-section {
+            text-align: center;
+            margin: 60px 0;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 15px 40px;
+            margin: 10px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-size: 1.1em;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: white;
+            color: #667eea;
+            box-shadow: 0 5px 20px rgba(255, 255, 255, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: scale(1.05);
+            box-shadow: 0 7px 30px rgba(255, 255, 255, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 2px solid white;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(1.05);
+        }
+
+        .api-info {
+            background: white;
+            border-radius: 15px;
+            padding: 40px;
+            margin: 40px 0;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .api-info h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+        }
+
+        .endpoints {
+            display: grid;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .endpoint {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+
+        .endpoint code {
+            background: #e9ecef;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            color: #495057;
+        }
+
+        .endpoint-method {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 0.85em;
+            margin-right: 10px;
+        }
+
+        .method-get {
+            background: #28a745;
+            color: white;
+        }
+
+        .method-post {
+            background: #007bff;
+            color: white;
+        }
+
+        footer {
+            text-align: center;
+            padding: 40px;
+            color: white;
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🚀 AI-Driven Job Market Insights</h1>
+            <p class="subtitle">Advanced analytics and predictions powered by machine learning</p>
+        </header>
+
+        <section class="features">
+            <div class="feature-card">
+                <div class="feature-icon">📊</div>
+                <h3>Real-Time Trends</h3>
+                <p>Get comprehensive job market trends with detailed statistics across multiple categories including salary ranges and distributions.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🤖</div>
+                <h3>AI Predictions</h3>
+                <p>Leverage multiple ML models (Linear, Polynomial, Decision Tree) to predict future salary trends with confidence scores.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">⚡</div>
+                <h3>High Performance</h3>
+                <p>Intelligent caching system ensures fast response times and efficient data processing for optimal user experience.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🔍</div>
+                <h3>Deep Analytics</h3>
+                <p>Detailed statistics including mean, median, standard deviation, and more for comprehensive market understanding.</p>
+            </div>
+        </section>
+
+        <div class="cta-section">
+            <a href="/dashboard" class="btn btn-primary">Open Dashboard</a>
+            <a href="/api/docs" class="btn btn-secondary">API Documentation</a>
+        </div>
+
+        <div class="api-info">
+            <h2>📡 Available API Endpoints</h2>
+            <div class="endpoints">
+                <div class="endpoint">
+                    <span class="endpoint-method method-get">GET</span>
+                    <code>/api/jobs/health</code> - Service health check
+                </div>
+                <div class="endpoint">
+                    <span class="endpoint-method method-get">GET</span>
+                    <code>/api/jobs/trends</code> - Get job market trends by category
+                </div>
+                <div class="endpoint">
+                    <span class="endpoint-method method-get">GET</span>
+                    <code>/api/jobs/statistics</code> - Get overall job market statistics
+                </div>
+                <div class="endpoint">
+                    <span class="endpoint-method method-post">POST</span>
+                    <code>/api/jobs/predict</code> - Predict future trends based on historical data
+                </div>
+                <div class="endpoint">
+                    <span class="endpoint-method method-post">POST</span>
+                    <code>/api/jobs/cache/clear</code> - Clear cached data
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p>Built with Flask, scikit-learn, and modern web technologies</p>
+            <p style="margin-top: 10px;">© 2026 AI-Driven Job Market Insights Dashboard</p>
+        </footer>
+    </div>
+</body>
+</html>
