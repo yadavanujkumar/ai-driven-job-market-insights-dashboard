@@ -1,0 +1,195 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "AI-Driven Job Market Insights Dashboard API",
+    "description": "A comprehensive API for analyzing job market trends and making predictions using AI/ML models",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "/api/jobs",
+      "description": "Job Market API"
+    }
+  ],
+  "paths": {
+    "/health": {
+      "get": {
+        "summary": "Health Check",
+        "description": "Returns the health status of the service",
+        "responses": {
+          "200": {
+            "description": "Service is healthy",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {"type": "string", "example": "success"},
+                    "message": {"type": "string", "example": "Service is healthy"},
+                    "service": {"type": "string", "example": "AI-Driven Job Market Insights Dashboard"}
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/trends": {
+      "get": {
+        "summary": "Get Job Market Trends",
+        "description": "Returns comprehensive job market trends with statistics per category",
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {"type": "string", "example": "success"},
+                    "data": {
+                      "type": "object",
+                      "additionalProperties": {
+                        "type": "object",
+                        "properties": {
+                          "average_salary": {"type": "number"},
+                          "median_salary": {"type": "number"},
+                          "min_salary": {"type": "number"},
+                          "max_salary": {"type": "number"},
+                          "std_deviation": {"type": "number"},
+                          "job_count": {"type": "integer"}
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error"
+          }
+        }
+      }
+    },
+    "/statistics": {
+      "get": {
+        "summary": "Get Overall Statistics",
+        "description": "Returns aggregated statistics across all job categories",
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {"type": "string", "example": "success"},
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "total_jobs": {"type": "integer"},
+                        "total_categories": {"type": "integer"},
+                        "categories": {
+                          "type": "array",
+                          "items": {"type": "string"}
+                        },
+                        "overall_average_salary": {"type": "number"},
+                        "overall_median_salary": {"type": "number"},
+                        "salary_range": {
+                          "type": "object",
+                          "properties": {
+                            "min": {"type": "number"},
+                            "max": {"type": "number"}
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/predict": {
+      "post": {
+        "summary": "Predict Future Job Trends",
+        "description": "Predicts future job trends based on historical data using AI/ML models",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["years", "salaries", "future_years"],
+                "properties": {
+                  "years": {
+                    "type": "array",
+                    "items": {"type": "integer"},
+                    "description": "Historical years",
+                    "example": [2020, 2021, 2022]
+                  },
+                  "salaries": {
+                    "type": "array",
+                    "items": {"type": "number"},
+                    "description": "Historical salaries",
+                    "example": [100000, 110000, 120000]
+                  },
+                  "future_years": {
+                    "type": "array",
+                    "items": {"type": "integer"},
+                    "description": "Years to predict",
+                    "example": [2023, 2024, 2025]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful prediction",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {"type": "string", "example": "success"},
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "predictions": {
+                          "type": "array",
+                          "items": {"type": "number"}
+                        },
+                        "model": {"type": "string"},
+                        "confidence_score": {"type": "number"}
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation error"
+          }
+        }
+      }
+    },
+    "/cache/clear": {
+      "post": {
+        "summary": "Clear Cache",
+        "description": "Clears all cached data to force fresh data retrieval",
+        "responses": {
+          "200": {
+            "description": "Cache cleared successfully"
+          }
+        }
+      }
+    }
+  }
+}

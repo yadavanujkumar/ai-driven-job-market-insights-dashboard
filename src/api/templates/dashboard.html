@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - AI Job Market Insights</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa;
+            color: #333;
+        }
+
+        .navbar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            color: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .navbar h1 {
+            font-size: 1.8em;
+        }
+
+        .navbar-links {
+            margin-top: 10px;
+        }
+
+        .navbar-links a {
+            color: white;
+            text-decoration: none;
+            margin-right: 20px;
+            opacity: 0.9;
+        }
+
+        .navbar-links a:hover {
+            opacity: 1;
+            text-decoration: underline;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 30px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+            border-left: 4px solid #667eea;
+        }
+
+        .stat-card h3 {
+            color: #667eea;
+            font-size: 0.9em;
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+
+        .stat-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .stat-label {
+            color: #888;
+            font-size: 0.9em;
+            margin-top: 5px;
+        }
+
+        .charts-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .chart-card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+        }
+
+        .chart-card h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 1.3em;
+        }
+
+        .prediction-section {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+            margin-bottom: 30px;
+        }
+
+        .prediction-section h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: border-color 0.3s;
+        }
+
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .input-hint {
+            font-size: 0.85em;
+            color: #888;
+            margin-top: 5px;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .prediction-result {
+            margin-top: 20px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #28a745;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+            color: #667eea;
+        }
+
+        .loading.active {
+            display: block;
+        }
+
+        .error {
+            background: #f8d7da;
+            border-left-color: #dc3545;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+
+        .category-details {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+            margin-bottom: 30px;
+        }
+
+        .category-details h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+        }
+
+        .category-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .category-item {
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+
+        .category-item h3 {
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .category-stat {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .category-stat:last-child {
+            border-bottom: none;
+        }
+
+        .category-stat-label {
+            color: #666;
+            font-weight: 500;
+        }
+
+        .category-stat-value {
+            font-weight: 600;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <h1>📊 AI-Driven Job Market Insights Dashboard</h1>
+        <div class="navbar-links">
+            <a href="/">← Back to Home</a>
+            <a href="/api/docs">API Docs</a>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="stats-grid" id="statsGrid">
+            <div class="stat-card">
+                <h3>Total Jobs</h3>
+                <div class="stat-value" id="totalJobs">-</div>
+                <div class="stat-label">Analyzed positions</div>
+            </div>
+            <div class="stat-card">
+                <h3>Categories</h3>
+                <div class="stat-value" id="totalCategories">-</div>
+                <div class="stat-label">Job categories</div>
+            </div>
+            <div class="stat-card">
+                <h3>Avg Salary</h3>
+                <div class="stat-value" id="avgSalary">-</div>
+                <div class="stat-label">Overall average</div>
+            </div>
+            <div class="stat-card">
+                <h3>Salary Range</h3>
+                <div class="stat-value" id="salaryRange">-</div>
+                <div class="stat-label">Min to Max</div>
+            </div>
+        </div>
+
+        <div class="charts-section">
+            <div class="chart-card">
+                <h2>Average Salary by Category</h2>
+                <canvas id="salaryChart"></canvas>
+            </div>
+            <div class="chart-card">
+                <h2>Jobs Distribution</h2>
+                <canvas id="jobsChart"></canvas>
+            </div>
+        </div>
+
+        <div class="category-details">
+            <h2>Detailed Category Statistics</h2>
+            <div class="category-grid" id="categoryGrid"></div>
+        </div>
+
+        <div class="prediction-section">
+            <h2>🤖 Predict Future Trends</h2>
+            <div class="form-group">
+                <label for="years">Historical Years (comma-separated)</label>
+                <input type="text" id="years" placeholder="e.g., 2020, 2021, 2022" value="2020, 2021, 2022">
+                <div class="input-hint">Enter years you have salary data for</div>
+            </div>
+            <div class="form-group">
+                <label for="salaries">Historical Salaries (comma-separated)</label>
+                <input type="text" id="salaries" placeholder="e.g., 100000, 110000, 120000" value="100000, 110000, 120000">
+                <div class="input-hint">Enter corresponding salary values</div>
+            </div>
+            <div class="form-group">
+                <label for="futureYears">Years to Predict (comma-separated)</label>
+                <input type="text" id="futureYears" placeholder="e.g., 2023, 2024, 2025" value="2023, 2024, 2025">
+                <div class="input-hint">Enter future years for prediction</div>
+            </div>
+            <button class="btn" onclick="predictTrends()">Generate Predictions</button>
+            <div class="loading" id="predictionLoading">
+                <p>🔮 Analyzing trends and generating predictions...</p>
+            </div>
+            <div id="predictionResult"></div>
+        </div>
+    </div>
+
+    <script>
+        let salaryChart, jobsChart;
+
+        async function loadDashboard() {
+            try {
+                // Load statistics
+                const statsResponse = await fetch('/api/jobs/statistics');
+                const statsData = await statsResponse.json();
+                
+                if (statsData.status === 'success') {
+                    const stats = statsData.data;
+                    document.getElementById('totalJobs').textContent = stats.total_jobs;
+                    document.getElementById('totalCategories').textContent = stats.total_categories;
+                    document.getElementById('avgSalary').textContent = '$' + Math.round(stats.overall_average_salary).toLocaleString();
+                    document.getElementById('salaryRange').textContent = 
+                        '$' + Math.round(stats.salary_range.min).toLocaleString() + ' - $' + 
+                        Math.round(stats.salary_range.max).toLocaleString();
+                }
+
+                // Load trends
+                const trendsResponse = await fetch('/api/jobs/trends');
+                const trendsData = await trendsResponse.json();
+                
+                if (trendsData.status === 'success') {
+                    const trends = trendsData.data;
+                    createCharts(trends);
+                    displayCategoryDetails(trends);
+                }
+            } catch (error) {
+                console.error('Error loading dashboard:', error);
+            }
+        }
+
+        function createCharts(trends) {
+            const categories = Object.keys(trends);
+            const avgSalaries = categories.map(cat => trends[cat].average_salary);
+            const jobCounts = categories.map(cat => trends[cat].job_count);
+
+            const colors = [
+                'rgba(102, 126, 234, 0.8)',
+                'rgba(118, 75, 162, 0.8)',
+                'rgba(237, 100, 166, 0.8)',
+                'rgba(255, 154, 158, 0.8)',
+                'rgba(250, 208, 196, 0.8)',
+                'rgba(156, 136, 255, 0.8)'
+            ];
+
+            // Salary Chart
+            const salaryCtx = document.getElementById('salaryChart').getContext('2d');
+            salaryChart = new Chart(salaryCtx, {
+                type: 'bar',
+                data: {
+                    labels: categories,
+                    datasets: [{
+                        label: 'Average Salary ($)',
+                        data: avgSalaries,
+                        backgroundColor: colors,
+                        borderColor: colors.map(c => c.replace('0.8', '1')),
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return '$' + value.toLocaleString();
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Jobs Distribution Chart
+            const jobsCtx = document.getElementById('jobsChart').getContext('2d');
+            jobsChart = new Chart(jobsCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: categories,
+                    datasets: [{
+                        data: jobCounts,
+                        backgroundColor: colors,
+                        borderColor: 'white',
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+        }
+
+        function displayCategoryDetails(trends) {
+            const grid = document.getElementById('categoryGrid');
+            grid.innerHTML = '';
+
+            for (const [category, data] of Object.entries(trends)) {
+                const item = document.createElement('div');
+                item.className = 'category-item';
+                item.innerHTML = `
+                    <h3>${category}</h3>
+                    <div class="category-stat">
+                        <span class="category-stat-label">Average Salary</span>
+                        <span class="category-stat-value">$${Math.round(data.average_salary).toLocaleString()}</span>
+                    </div>
+                    <div class="category-stat">
+                        <span class="category-stat-label">Median Salary</span>
+                        <span class="category-stat-value">$${Math.round(data.median_salary).toLocaleString()}</span>
+                    </div>
+                    <div class="category-stat">
+                        <span class="category-stat-label">Min Salary</span>
+                        <span class="category-stat-value">$${Math.round(data.min_salary).toLocaleString()}</span>
+                    </div>
+                    <div class="category-stat">
+                        <span class="category-stat-label">Max Salary</span>
+                        <span class="category-stat-value">$${Math.round(data.max_salary).toLocaleString()}</span>
+                    </div>
+                    <div class="category-stat">
+                        <span class="category-stat-label">Std Deviation</span>
+                        <span class="category-stat-value">$${Math.round(data.std_deviation).toLocaleString()}</span>
+                    </div>
+                    <div class="category-stat">
+                        <span class="category-stat-label">Job Count</span>
+                        <span class="category-stat-value">${data.job_count}</span>
+                    </div>
+                `;
+                grid.appendChild(item);
+            }
+        }
+
+        async function predictTrends() {
+            const resultDiv = document.getElementById('predictionResult');
+            const loadingDiv = document.getElementById('predictionLoading');
+            resultDiv.innerHTML = '';
+            loadingDiv.classList.add('active');
+
+            try {
+                const years = document.getElementById('years').value.split(',').map(y => parseInt(y.trim()));
+                const salaries = document.getElementById('salaries').value.split(',').map(s => parseFloat(s.trim()));
+                const futureYears = document.getElementById('futureYears').value.split(',').map(y => parseInt(y.trim()));
+
+                const response = await fetch('/api/jobs/predict', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        years: years,
+                        salaries: salaries,
+                        future_years: futureYears
+                    })
+                });
+
+                const data = await response.json();
+                loadingDiv.classList.remove('active');
+
+                if (data.status === 'success') {
+                    const predictions = data.data.predictions;
+                    const model = data.data.model;
+                    const confidence = data.data.confidence_score;
+
+                    let html = '<div class="prediction-result">';
+                    html += `<h3>Prediction Results</h3>`;
+                    html += `<p><strong>Model:</strong> ${model}</p>`;
+                    html += `<p><strong>Confidence Score:</strong> ${(confidence * 100).toFixed(2)}%</p>`;
+                    html += '<h4>Predicted Salaries:</h4><ul>';
+                    
+                    futureYears.forEach((year, idx) => {
+                        html += `<li><strong>${year}:</strong> $${Math.round(predictions[idx]).toLocaleString()}</li>`;
+                    });
+                    
+                    html += '</ul></div>';
+                    resultDiv.innerHTML = html;
+                } else {
+                    resultDiv.innerHTML = `<div class="error">Error: ${data.error}</div>`;
+                }
+            } catch (error) {
+                loadingDiv.classList.remove('active');
+                resultDiv.innerHTML = `<div class="error">Error: ${error.message}</div>`;
+            }
+        }
+
+        // Load dashboard on page load
+        window.addEventListener('load', loadDashboard);
+    </script>
+</body>
+</html>
