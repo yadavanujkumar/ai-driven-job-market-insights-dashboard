@@ -149,7 +149,7 @@ def show_dashboard(job_service):
             st.subheader("📊 Job Distribution")
             
             # Prepare data for pie chart
-            job_counts = [data['count'] for data in trends.values()]
+            job_counts = [data['job_count'] for data in trends.values()]
             
             fig = px.pie(
                 values=job_counts,
@@ -168,7 +168,7 @@ def show_dashboard(job_service):
         for category, data in trends.items():
             details_data.append({
                 'Category': category,
-                'Count': data['count'],
+                'Count': data['job_count'],
                 'Avg Salary': f"${data['average_salary']:,.0f}",
                 'Median': f"${data['median_salary']:,.0f}",
                 'Min': f"${data['min_salary']:,.0f}",
@@ -204,7 +204,7 @@ def show_trends_analysis(job_service):
             col1, col2, col3 = st.columns(3)
             
             with col1:
-                st.metric("Jobs Available", category_data['count'])
+                st.metric("Jobs Available", category_data['job_count'])
             with col2:
                 st.metric("Average Salary", f"${category_data['average_salary']:,.0f}")
             with col3:
