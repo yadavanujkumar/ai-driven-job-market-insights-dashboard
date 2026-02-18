@@ -76,13 +76,48 @@ def main():
 
 def show_dashboard(job_service):
     """Display main dashboard with statistics and visualizations."""
-    st.header("📈 Market Overview")
+    st.header("📈 Indian Job Market Overview")
     
     try:
         # Get statistics
         with st.spinner("Loading market data..."):
             stats = job_service.get_statistics()
-            trends = job_service.get_job_trends()
+            trends_data = job_service.get_job_trends()
+        
+        # Extract metadata and trends
+        metadata = stats.get('metadata', {})
+        if isinstance(trends_data, dict) and 'trends' in trends_data:
+            trends = trends_data['trends']
+            trends_metadata = trends_data.get('metadata', metadata)
+        else:
+            trends = trends_data
+            trends_metadata = metadata
+        
+        # Display data source information
+        if trends_metadata:
+            with st.expander("📊 Data Sources & Information", expanded=False):
+                col1, col2 = st.columns(2)
+                with col1:
+                    st.write(f"**Region:** {trends_metadata.get('region', 'India')}")
+                    st.write(f"**Currency:** {trends_metadata.get('currency', 'INR')} ({trends_metadata.get('currency_symbol', '₹')})")
+                    if 'last_updated' in trends_metadata:
+                        st.write(f"**Last Updated:** {trends_metadata['last_updated'][:10]}")
+                
+                with col2:
+                    data_sources = trends_metadata.get('data_sources', {})
+                    if data_sources:
+                        st.write(f"**Primary Sources:** {data_sources.get('primary', 'N/A')}")
+                        st.write(f"**Reference Sources:** {data_sources.get('reference', 'N/A')}")
+                        if 'salary_survey_period' in data_sources:
+                            st.write(f"**Survey Period:** {data_sources['salary_survey_period']}")
+                
+                if data_sources.get('note'):
+                    st.info(f"ℹ️ {data_sources['note']}")
+                if data_sources.get('disclaimer'):
+                    st.caption(f"⚠️ {data_sources['disclaimer']}")
+        
+        # Get currency symbol
+        currency_symbol = trends_metadata.get('currency_symbol', '₹')
         
         # Display key metrics
         col1, col2, col3, col4 = st.columns(4)
@@ -104,7 +139,7 @@ def show_dashboard(job_service):
         with col3:
             st.metric(
                 label="Avg Salary",
-                value=f"${stats['overall_average_salary']:,.0f}",
+                value=f"{currency_symbol}{stats['overall_average_salary']:,.0f}",
                 delta=None
             )
         
@@ -112,7 +147,7 @@ def show_dashboard(job_service):
             salary_range = stats['salary_range']
             st.metric(
                 label="Salary Range",
-                value=f"${salary_range['min']:,.0f} - ${salary_range['max']:,.0f}",
+                value=f"{currency_symbol}{salary_range['min']:,.0f} - {currency_symbol}{salary_range['max']:,.0f}",
                 delta=None
             )
         
@@ -134,7 +169,7 @@ def show_dashboard(job_service):
             fig = px.bar(
                 x=categories,
                 y=avg_salaries,
-                labels={'x': 'Job Category', 'y': 'Average Salary ($)'},
+                labels={'x': 'Job Category', 'y': f'Average Salary ({currency_symbol})'},
                 color=avg_salaries,
                 color_continuous_scale='Viridis'
             )
@@ -169,11 +204,11 @@ def show_dashboard(job_service):
             details_data.append({
                 'Category': category,
                 'Count': data['job_count'],
-                'Avg Salary': f"${data['average_salary']:,.0f}",
-                'Median': f"${data['median_salary']:,.0f}",
-                'Min': f"${data['min_salary']:,.0f}",
-                'Max': f"${data['max_salary']:,.0f}",
-                'Std Dev': f"${data['std_deviation']:,.0f}"
+                'Avg Salary': f"{currency_symbol}{data['average_salary']:,.0f}",
+                'Median': f"{currency_symbol}{data['median_salary']:,.0f}",
+                'Min': f"{currency_symbol}{data['min_salary']:,.0f}",
+                'Max': f"{currency_symbol}{data['max_salary']:,.0f}",
+                'Std Dev': f"{currency_symbol}{data['std_deviation']:,.0f}"
             })
         
         df = pd.DataFrame(details_data)
@@ -189,7 +224,18 @@ def show_trends_analysis(job_service):
     
     try:
         with st.spinner("Analyzing job market trends..."):
-            trends = job_service.get_job_trends()
+            trends_data = job_service.get_job_trends()
+        
+        # Extract metadata and trends
+        if isinstance(trends_data, dict) and 'trends' in trends_data:
+            trends = trends_data['trends']
+            metadata = trends_data.get('metadata', {})
+        else:
+            trends = trends_data
+            metadata = {}
+        
+        # Get currency symbol
+        currency_symbol = metadata.get('currency_symbol', '₹')
         
         # Category selector
         selected_category = st.selectbox(
@@ -206,9 +252,9 @@ def show_trends_analysis(job_service):
             with col1:
                 st.metric("Jobs Available", category_data['job_count'])
             with col2:
-                st.metric("Average Salary", f"${category_data['average_salary']:,.0f}")
+                st.metric("Average Salary", f"{currency_symbol}{category_data['average_salary']:,.0f}")
             with col3:
-                st.metric("Median Salary", f"${category_data['median_salary']:,.0f}")
+                st.metric("Median Salary", f"{currency_symbol}{category_data['median_salary']:,.0f}")
             
             st.markdown("---")
             
@@ -232,7 +278,7 @@ def show_trends_analysis(job_service):
                     marker_color='indianred'
                 ))
                 fig.update_layout(
-                    yaxis_title="Salary ($)",
+                    yaxis_title=f"Salary ({currency_symbol})",
                     height=400
                 )
                 st.plotly_chart(fig, use_container_width=True)
@@ -273,14 +319,14 @@ def show_trends_analysis(job_service):
             
             col1, col2 = st.columns(2)
             with col1:
-                st.write(f"**Minimum Salary:** ${category_data['min_salary']:,.0f}")
-                st.write(f"**Maximum Salary:** ${category_data['max_salary']:,.0f}")
-                st.write(f"**Salary Range:** ${category_data['max_salary'] - category_data['min_salary']:,.0f}")
+                st.write(f"**Minimum Salary:** {currency_symbol}{category_data['min_salary']:,.0f}")
+                st.write(f"**Maximum Salary:** {currency_symbol}{category_data['max_salary']:,.0f}")
+                st.write(f"**Salary Range:** {currency_symbol}{category_data['max_salary'] - category_data['min_salary']:,.0f}")
             
             with col2:
-                st.write(f"**Average Salary:** ${category_data['average_salary']:,.0f}")
-                st.write(f"**Median Salary:** ${category_data['median_salary']:,.0f}")
-                st.write(f"**Standard Deviation:** ${category_data['std_deviation']:,.0f}")
+                st.write(f"**Average Salary:** {currency_symbol}{category_data['average_salary']:,.0f}")
+                st.write(f"**Median Salary:** {currency_symbol}{category_data['median_salary']:,.0f}")
+                st.write(f"**Standard Deviation:** {currency_symbol}{category_data['std_deviation']:,.0f}")
             
     except Exception as e:
         st.error(f"Error loading trends data: {str(e)}")
@@ -289,7 +335,7 @@ def show_trends_analysis(job_service):
 def show_prediction(job_service):
     """Display salary prediction interface."""
     st.header("🔮 Salary Prediction")
-    st.write("Predict future salary trends using AI/ML models")
+    st.write("Predict future salary trends using AI/ML models for the Indian job market")
     
     # Model selection
     model_type = st.selectbox(
@@ -301,7 +347,7 @@ def show_prediction(job_service):
     st.markdown("---")
     
     # Input section
-    st.subheader("📥 Input Historical Data")
+    st.subheader("📥 Input Historical Data (in INR)")
     
     col1, col2 = st.columns(2)
     
@@ -314,9 +360,9 @@ def show_prediction(job_service):
         
     with col2:
         salaries_input = st.text_input(
-            "Historical Salaries (comma-separated)",
-            value="95000,105000,115000,125000",
-            help="Enter corresponding salary values"
+            "Historical Salaries in ₹ (comma-separated)",
+            value="1000000,1100000,1250000,1400000",
+            help="Enter corresponding salary values in Indian Rupees"
         )
     
     future_years_input = st.text_input(
@@ -364,7 +410,7 @@ def show_prediction(job_service):
             with col2:
                 predictions = result['predictions']
                 avg_predicted = sum(predictions) / len(predictions)
-                st.metric("Average Predicted Salary", f"${avg_predicted:,.0f}")
+                st.metric("Average Predicted Salary", f"₹{avg_predicted:,.0f}")
             
             # Visualization
             st.markdown("---")
@@ -396,12 +442,12 @@ def show_prediction(job_service):
                 y='Salary',
                 color='Type',
                 markers=True,
-                title="Salary Trend: Historical vs Predicted"
+                title="Salary Trend: Historical vs Predicted (INR)"
             )
             fig.update_layout(
                 height=500,
                 xaxis_title="Year",
-                yaxis_title="Salary ($)",
+                yaxis_title="Salary (₹)",
                 hovermode='x unified'
             )
             st.plotly_chart(fig, use_container_width=True)
@@ -410,7 +456,7 @@ def show_prediction(job_service):
             st.subheader("📋 Detailed Predictions")
             predictions_df = pd.DataFrame({
                 'Year': future_years,
-                'Predicted Salary': [f"${p:,.0f}" for p in predictions]
+                'Predicted Salary': [f"₹{p:,.0f}" for p in predictions]
             })
             st.dataframe(predictions_df, use_container_width=True, hide_index=True)
             
@@ -425,17 +471,42 @@ def show_about():
     st.header("ℹ️ About This Dashboard")
     
     st.markdown("""
-    ### AI-Driven Job Market Insights Dashboard
+    ### AI-Driven Indian Job Market Insights Dashboard
     
-    This interactive dashboard provides comprehensive insights into the job market using AI and machine learning.
+    This interactive dashboard provides comprehensive insights into the **Indian job market** using AI and machine learning.
+    All salaries are displayed in **Indian Rupees (₹)** and data is based on real salary surveys from Indian job portals.
     
     #### 🎯 Features
     
-    - **Real-time Data Analysis**: Get up-to-date job market statistics and trends
+    - **Real-time Data Analysis**: Indian job market statistics and trends based on actual salary surveys
     - **Interactive Visualizations**: Explore data through intuitive charts and graphs
     - **AI-Powered Predictions**: Forecast future salary trends using machine learning
     - **Multiple ML Models**: Choose from Linear Regression, Polynomial Regression, or Decision Tree models
     - **Comprehensive Statistics**: View detailed statistics for each job category
+    - **Data Source Transparency**: Clear attribution of data sources and references
+    
+    #### 📊 Data Sources
+    
+    Our data is aggregated from multiple reliable Indian job market sources:
+    
+    **Primary Sources:**
+    - Naukri.com (Leading Indian job portal)
+    - Indeed India
+    - LinkedIn India
+    
+    **Reference Sources:**
+    - AmbitionBox (Salary insights and company reviews)
+    - Glassdoor India
+    - PayScale India
+    
+    **Survey Period:** 2023-2024
+    
+    #### 💰 Currency & Market
+    
+    - **Region:** India
+    - **Currency:** Indian Rupees (₹ INR)
+    - **Salary Format:** Annual CTC (Cost to Company)
+    - **Market Focus:** Indian tech and corporate job market
     
     #### 🔧 Technologies
     
@@ -448,30 +519,47 @@ def show_about():
     #### 📊 Data Categories
     
     The dashboard analyzes job market data across multiple categories including:
-    - Engineering
-    - Data Science
+    - Software Engineering
+    - Data Science & Analytics
     - Product Management
-    - Design
-    - Marketing
-    - Sales
+    - UI/UX Design
+    - Digital Marketing
+    - Sales & Business Development
+    - DevOps & Cloud Engineering
+    - Quality Assurance
     
     #### 🚀 How to Use
     
-    1. **Dashboard**: View overall market statistics and trends
+    1. **Dashboard**: View overall Indian market statistics and trends
     2. **Trends Analysis**: Dive deep into specific job categories
-    3. **Salary Prediction**: Forecast future salary trends with AI models
+    3. **Salary Prediction**: Forecast future salary trends with AI models (in INR)
     
-    #### 📝 Notes
+    #### 📝 Important Notes
     
     - Data is cached for performance optimization
     - Use the "Clear Cache" button to refresh data
     - Predictions are based on historical trends and may not reflect actual future values
+    - Salary ranges are indicative and based on industry reports
+    - Actual salaries may vary based on company, location, skills, and negotiation
+    - All amounts are in Indian Rupees (₹) per annum
+    
+    #### ⚠️ Disclaimer
+    
+    The salary data presented is based on aggregated information from multiple sources and salary surveys.
+    Individual salary offers may vary significantly based on:
+    - Company size and type (Product/Service/Startup)
+    - Location and cost of living
+    - Individual skills and experience
+    - Current market conditions
+    - Negotiation skills
     
     ---
     
-    **Version**: 2.1 (Streamlit Edition)
+    **Version**: 3.0 (Indian Market Edition)
     
     **Repository**: [GitHub](https://github.com/yadavanujkumar/ai-driven-job-market-insights-dashboard)
+    
+    **Last Updated**: 2024
     """)
 
 if __name__ == "__main__":
