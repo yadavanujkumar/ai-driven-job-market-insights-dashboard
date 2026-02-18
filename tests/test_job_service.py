@@ -7,17 +7,28 @@ class TestJobService(unittest.TestCase):
     @patch('src.repositories.job_repository.JobRepository.fetch_job_data')
     @patch('src.services.ai_model.AIModel.analyze_trends')
     def test_get_job_trends(self, mock_analyze_trends, mock_fetch_job_data):
-        mock_fetch_job_data.return_value = [
-            {'category': 'Engineering', 'salary': 100000},
-            {'category': 'Engineering', 'salary': 120000},
-            {'category': 'Marketing', 'salary': 80000}
-        ]
+        # Return data in new format with metadata
+        mock_fetch_job_data.return_value = {
+            'jobs': [
+                {'category': 'Engineering', 'salary': 100000},
+                {'category': 'Engineering', 'salary': 120000},
+                {'category': 'Marketing', 'salary': 80000}
+            ],
+            'metadata': {
+                'region': 'India',
+                'currency': 'INR'
+            }
+        }
         mock_analyze_trends.return_value = {'Engineering': 110000, 'Marketing': 80000}
 
         service = JobService()
-        trends = service.get_job_trends()
+        result = service.get_job_trends()
 
-        self.assertEqual(trends, {'Engineering': 110000, 'Marketing': 80000})
+        # Result should now include both trends and metadata
+        self.assertIn('trends', result)
+        self.assertIn('metadata', result)
+        self.assertEqual(result['trends'], {'Engineering': 110000, 'Marketing': 80000})
+        self.assertEqual(result['metadata']['region'], 'India')
 
     @patch('src.services.ai_model.AIModel.predict')
     def test_predict_job_trends(self, mock_predict):

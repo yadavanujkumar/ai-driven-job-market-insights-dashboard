@@ -18,7 +18,7 @@ class JobService:
         Fetch and process job market trends with caching.
         
         Returns:
-            Dictionary with job market trends
+            Dictionary with job market trends and metadata
         """
         cache_key = 'job_trends'
         
@@ -30,14 +30,29 @@ class JobService:
         
         try:
             logger.info("Fetching fresh job data")
-            job_data = self.job_repository.fetch_job_data()
+            job_data_response = self.job_repository.fetch_job_data()
+            
+            # Handle both old format (list) and new format (dict with metadata)
+            if isinstance(job_data_response, dict) and 'jobs' in job_data_response:
+                job_data = job_data_response['jobs']
+                metadata = job_data_response.get('metadata', {})
+            else:
+                job_data = job_data_response
+                metadata = {}
+            
             trends = self.ai_model.analyze_trends(job_data)
             
+            # Add metadata to trends
+            result = {
+                'trends': trends,
+                'metadata': metadata
+            }
+            
             # Cache the results
-            self.cache.set(cache_key, trends)
+            self.cache.set(cache_key, result)
             
             logger.info("Successfully analyzed job trends")
-            return trends
+            return result
             
         except ValidationError as e:
             logger.error(f"Validation error: {str(e)}")
@@ -71,19 +86,28 @@ class JobService:
     
     def get_statistics(self):
         """
-        Get aggregated statistics from job market data.
+        Get aggregated statistics from job market data with metadata.
         
         Returns:
-            Dictionary with overall statistics
+            Dictionary with overall statistics and data sources
         """
         try:
             logger.info("Fetching job statistics")
-            job_data = self.job_repository.fetch_job_data()
+            job_data_response = self.job_repository.fetch_job_data()
+            
+            # Handle both old format (list) and new format (dict with metadata)
+            if isinstance(job_data_response, dict) and 'jobs' in job_data_response:
+                job_data = job_data_response['jobs']
+                metadata = job_data_response.get('metadata', {})
+            else:
+                job_data = job_data_response
+                metadata = {}
             
             if not job_data:
                 return {
                     'total_jobs': 0,
-                    'message': 'No job data available'
+                    'message': 'No job data available',
+                    'metadata': metadata
                 }
             
             # Calculate overall statistics
@@ -100,7 +124,8 @@ class JobService:
                 'salary_range': {
                     'min': float(np.min(salaries)),
                     'max': float(np.max(salaries))
-                }
+                },
+                'metadata': metadata
             }
             
             logger.info(f"Statistics calculated for {len(job_data)} jobs")

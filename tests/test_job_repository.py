@@ -18,8 +18,12 @@ class TestJobRepository(unittest.TestCase):
         repo = JobRepository()
         data = repo.fetch_job_data()
         
-        self.assertEqual(len(data), 1)
-        self.assertEqual(data[0]['category'], 'Engineering')
+        # Data should be wrapped in metadata structure
+        self.assertIsInstance(data, dict)
+        self.assertIn('jobs', data)
+        self.assertIn('metadata', data)
+        self.assertEqual(len(data['jobs']), 1)
+        self.assertEqual(data['jobs'][0]['category'], 'Engineering')
 
     @patch('src.repositories.job_repository.requests.get')
     def test_fetch_job_data_fallback(self, mock_get):
@@ -29,11 +33,16 @@ class TestJobRepository(unittest.TestCase):
         repo = JobRepository()
         data = repo.fetch_job_data()
         
-        # Should return fallback data
-        self.assertIsInstance(data, list)
-        self.assertGreater(len(data), 0)
-        self.assertIn('category', data[0])
-        self.assertIn('salary', data[0])
+        # Should return fallback data with metadata
+        self.assertIsInstance(data, dict)
+        self.assertIn('jobs', data)
+        self.assertIn('metadata', data)
+        self.assertGreater(len(data['jobs']), 0)
+        self.assertIn('category', data['jobs'][0])
+        self.assertIn('salary', data['jobs'][0])
+        # Check metadata
+        self.assertEqual(data['metadata']['region'], 'India')
+        self.assertEqual(data['metadata']['currency'], 'INR')
 
     @patch('src.repositories.job_repository.requests.get')
     def test_fetch_job_data_http_error(self, mock_get):
@@ -46,6 +55,8 @@ class TestJobRepository(unittest.TestCase):
         repo = JobRepository()
         data = repo.fetch_job_data()
         
-        # Should return fallback data
-        self.assertIsInstance(data, list)
-        self.assertGreater(len(data), 0)
+        # Should return fallback data with metadata
+        self.assertIsInstance(data, dict)
+        self.assertIn('jobs', data)
+        self.assertIn('metadata', data)
+        self.assertGreater(len(data['jobs']), 0)
