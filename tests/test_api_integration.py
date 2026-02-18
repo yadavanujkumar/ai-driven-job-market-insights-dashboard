@@ -24,12 +24,18 @@ class TestAPIIntegration(unittest.TestCase):
         data = response.get_json()
         self.assertEqual(data['status'], 'success')
         self.assertIn('data', data)
-        # Should have multiple categories
-        self.assertGreater(len(data['data']), 0)
+        # Data should now have trends and metadata
+        self.assertIn('trends', data['data'])
+        self.assertIn('metadata', data['data'])
+        # Should have multiple categories in trends
+        self.assertGreater(len(data['data']['trends']), 0)
         # Check structure of first category
-        first_category = list(data['data'].values())[0]
+        first_category = list(data['data']['trends'].values())[0]
         self.assertIn('average_salary', first_category)
         self.assertIn('job_count', first_category)
+        # Check metadata
+        self.assertEqual(data['data']['metadata']['region'], 'India')
+        self.assertEqual(data['data']['metadata']['currency'], 'INR')
 
     def test_get_statistics(self):
         """Test get statistics endpoint."""

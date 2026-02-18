@@ -1,7 +1,7 @@
 import requests
 from src.config import Config
 from src.utils.logger import setup_logger
-from datetime import datetime
+from datetime import datetime, timezone
 
 logger = setup_logger(__name__)
 
@@ -36,7 +36,7 @@ class JobRepository:
                     return {
                         'jobs': data,
                         'metadata': self._get_metadata(),
-                        'last_updated': datetime.utcnow().isoformat()
+                        'last_updated': datetime.now(timezone.utc).isoformat()
                     }
             else:
                 logger.warning(f"API returned status code: {response.status_code}")
@@ -53,7 +53,7 @@ class JobRepository:
             'currency': Config.CURRENCY,
             'currency_symbol': Config.CURRENCY_SYMBOL,
             'data_sources': Config.DATA_SOURCES,
-            'last_updated': datetime.utcnow().isoformat()
+            'last_updated': datetime.now(timezone.utc).isoformat()
         }
     
     def _get_indian_market_data(self):
@@ -149,7 +149,7 @@ class JobRepository:
                     'note': 'Salaries based on actual market data from Indian job portals and salary surveys',
                     'disclaimer': 'Salary ranges are indicative and based on industry reports. Actual salaries may vary based on company, location, skills, and negotiation.'
                 },
-                'last_updated': datetime.utcnow().isoformat(),
+                'last_updated': datetime.now(timezone.utc).isoformat(),
                 'total_jobs': len(jobs_data),
                 'data_quality': 'Based on real salary surveys and market reports'
             }
