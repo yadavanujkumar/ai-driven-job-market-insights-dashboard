@@ -559,7 +559,7 @@ def show_about():
     
     **Repository**: [GitHub](https://github.com/yadavanujkumar/ai-driven-job-market-insights-dashboard)
     
-    **Last Updated**: 2024
+    **Last Updated**: February 2024
     """)
 
 if __name__ == "__main__":

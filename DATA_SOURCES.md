@@ -149,7 +149,7 @@ The application uses this data in the following ways:
 2. **Market Benchmarking**: Users can compare their salary expectations with market trends
 3. **Trend Analysis**: Historical patterns help predict future salary trends
 4. **Category Insights**: Detailed statistics for career planning and decision-making
-4. **Prediction Models**: AI models trained on this data provide salary forecasts
+5. **Prediction Models**: AI models trained on this data provide salary forecasts
 
 ## Future Enhancements
 
