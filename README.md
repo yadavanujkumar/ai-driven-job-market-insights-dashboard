@@ -1,15 +1,32 @@
 # AI-Driven Job Market Insights Dashboard
 
-A comprehensive web application for analyzing job market trends and making predictions using AI/ML models. Features an interactive dashboard, RESTful API, and Swagger documentation.
+A comprehensive web application for analyzing job market trends and making predictions using AI/ML models. Available as both a **Streamlit interactive app** and a **Flask RESTful API** with Swagger documentation.
 
 ## 🚀 Quick Start
+
+### Option 1: Streamlit Application (Recommended)
 
 1. **Install Dependencies**
    ```bash
    pip install -r requirements.txt
    ```
 
-2. **Run the Application**
+2. **Run the Streamlit App**
+   ```bash
+   streamlit run streamlit_app.py
+   ```
+
+3. **Access the Dashboard**
+   - Streamlit Dashboard: http://localhost:8501
+
+### Option 2: Flask API + Web Dashboard
+
+1. **Install Dependencies**
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+2. **Run the Flask Application**
    ```bash
    python src/api/app.py
    ```
@@ -169,12 +186,54 @@ The application supports configuration via environment variables:
 
 ### Docker Deployment
 
+**Flask Version:**
 ```bash
 docker build -t job-insights-dashboard .
 docker run -p 5000:5000 job-insights-dashboard
 ```
 
 Access the dashboard at http://localhost:5000/
+
+### Streamlit Cloud Deployment
+
+The Streamlit app can be easily deployed to Streamlit Cloud:
+
+1. **Push to GitHub**
+   ```bash
+   git add .
+   git commit -m "Add Streamlit deployment"
+   git push
+   ```
+
+2. **Deploy on Streamlit Cloud**
+   - Go to [share.streamlit.io](https://share.streamlit.io)
+   - Sign in with GitHub
+   - Click "New app"
+   - Select your repository
+   - Set the main file path to: `streamlit_app.py`
+   - Click "Deploy"
+
+3. **Configuration**
+   - The app uses `.streamlit/config.toml` for configuration
+   - No additional secrets or configuration needed for basic deployment
+
+### Local Streamlit Development
+
+```bash
+# Install dependencies
+pip install -r requirements.txt
+
+# Run the Streamlit app
+streamlit run streamlit_app.py
+
+# Run on a specific port
+streamlit run streamlit_app.py --server.port 8502
+
+# Run in development mode with auto-reload
+streamlit run streamlit_app.py --server.runOnSave true
+```
+
+Access the Streamlit app at http://localhost:8501
 
 ### Testing
 
@@ -191,6 +250,30 @@ PYTHONPATH=. pytest tests/ -v
 ```
 
 ## What's New
+
+### Version 2.1 - Streamlit Edition
+
+🎉 **Major Addition: Streamlit Application**
+
+The dashboard is now available as an interactive Streamlit application, making it even easier to deploy and use!
+
+✨ **Streamlit Features:**
+- **Modern Interactive UI**: Built with Streamlit for a smooth, reactive user experience
+- **Real-time Visualizations**: Interactive Plotly charts (bar charts, pie charts, box plots, gauges)
+- **Multi-page Navigation**: Separate pages for Dashboard, Trends Analysis, and Predictions
+- **Easy Deployment**: One-click deployment to Streamlit Cloud
+- **Cache Management**: Built-in cache control for optimal performance
+- **Responsive Design**: Works seamlessly on desktop and mobile devices
+
+🚀 **Deployment Options:**
+1. **Streamlit App** (NEW): `streamlit run streamlit_app.py` - Recommended for quick deployment
+2. **Flask API**: `python src/api/app.py` - For programmatic access and custom integrations
+
+📊 **Streamlit Pages:**
+- **Dashboard**: Overview with key metrics and visualizations
+- **Trends Analysis**: Deep dive into specific job categories
+- **Salary Prediction**: AI-powered salary forecasting
+- **About**: Information about the application and features
 
 ### Version 2.0 - Interactive Dashboard Update
 
